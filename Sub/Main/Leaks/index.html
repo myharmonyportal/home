@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MyHarmonyPortal</title>
+	<link rel="icon" type="image/x-icon" href="favicon.png">
+
+	<style>
+		body {
+			font-family: Segoe UI, sans-serif;
+			background-color: #F5F5F5;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+			min-width: 900px; /* Add a minimum width of 900 pixels */
+			background-image: url('https://digitalserpant.github.io/Pics/what-is-the-purpose-of-hacking.png');
+			background-size: cover;
+			background-position: center;
+			background-attachment: fixed;
+		}
+	
+		h1 {
+			font-size: 1.5rem;
+			margin-top: rem;
+			margin-bottom: 0.5rem;
+			color: #08e700;
+			text-transform: uppercase;
+			font-weight: bold;
+		}
+	
+		p {
+			font-size: 1.2rem;
+			margin-top: 0;
+			margin-bottom: 2rem;
+			color: #333333;
+			font-weight: 600;
+		}
+	
+		.container {
+			width: 50%;
+			padding: 2rem;
+			background-color: white;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			border-radius: 80px;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Status: Cracked</h1>
+		<p>HSI CHROMEBOOK:   Working on it </p>
+
+		<h1>Status: Cracked</h1>
+		<p>HSI GUEST:               Working on it</p>
+	</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+<script>
+    var myCookie = Cookies.get('Verifide');
+
+if(myCookie==='close'||myCookie==='admin'){
+this.close();
+}
+else{
+}
+          window.addEventListener("beforeunload", function(event) {
+          Cookies.set('Verifide', 'close', { expires: 1 })
+         });
+  </script>
+</html>

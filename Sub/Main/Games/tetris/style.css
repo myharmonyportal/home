@@ -1,0 +1,28 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: rgb(0, 0, 0);
+    height: 100vh;
+}
+
+.container {
+    position: relative;
+}
+
+#restart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: black;
+    background-color: white;
+    border-radius: 4px;
+    padding: 20px 50px; /* Increase the padding to make the button bigger */
+    font-size: 18px; /* Increase the font size to match the larger button */
+}
+
+#my-canvas {
+    background-color: white;
+    margin: 0 auto;
+}

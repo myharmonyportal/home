@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Mainpage</title>
+    <link rel="icon" type="image/x-icon" href="./Pics/favicon.png">
+    <style>
+      * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Fonts */
+  body {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  
+  h1, h2 {
+    font-weight: 600;
+  }
+  
+  /* Main styles */
+  main {
+    /* Use relative units instead of absolute units like pixels */
+    padding: 5vw 0;
+    min-width: 900px; /* Add a minimum width of 320 pixels */
+    /* Use vendor prefixes for cross-browser compatibility */
+    background-image: -webkit-url('Portal.png');
+    background-image: -moz-url('Portal.png');
+    background-image: -ms-url('Portal.png');
+    background-image: url('Portal.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    overflow-y: auto;
+    background-attachment: fixed;
+  }
+  
+  section {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+  }
+  
+  li {
+    margin: 3.2vw;
+    margin-bottom: 1vw; /* reduce margin-bottom */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 290px;
+    justify-content: space-between;
+  }
+  
+  button {
+    background-color: #464646;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 400;
+    transition: background-color 0.2s ease-in-out;
+    width: 270px;
+    height: 100px;
+    margin-bottom: 2vw; 
+    justify-content: center;
+    text-align: center;
+    font-family: 'Quicksand', sans-serif;
+    transition: transform 0.2s ease-out;
+  }
+  
+  button:hover {
+    background-color: #333;
+    transform: scale(1.1);
+  }
+  
+  main::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: -webkit
+  }
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=SF+Pro+Display:400,600&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <main id="a">
+      <section>
+        <ul>
+          <li><a onclick="sus();" href="Main/ChatGPT/index.html"target="_self"><button>Chat-GPT(Beta)</button></a></li>
+          <li><a onclick="sus();" href="Main/Youtube/index.html" target="_blank" ><button>Youtube</button></a></li>
+          <li><a onclick="sus();" href="https://my.harmonytx.org/"target="_blank"><button>ClassLink</button></a></li>
+          <li><a onclick="sus();" href="Main/Leaks/index.html"target="_self"><button>WIFI Password Leaks</button></a></li>
+          <li><a onclick="sus();" href="https://sites.google.com/view/browserharmony/browser"target="_self"><button>Browser</button></a></li>
+          <li><a onclick="sus();" href="Main/Games/index.html"target="_self"><button>Games</button></a></li>
+          <li><a onclick="sus();" href="https://app.apponfly.com/trial"target="_self"><button>Windows</button></a></li>
+          <li><a onclick="sus();" href="Main/FeedBack/feed.html"target="_self"><button>Feedback</button></a></li>
+          <li><a onclick="sus();" href="Main/Skins/index.html"target="_self"><button>Minecraft Skins</button></a></li>
+          <li><a onclick="sus();" href="Main/Haggs/index.html"target="_self"><button>Hacks</button></a></li>
+        </ul>
+      </section>
+    </main>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+  <script src="script.js"></script>
+  <script>var myCookie = Cookies.get('Verifide');
+    if(myCookie==='admin'){
+        function sus() {
+      Cookies.set('Verifide', 'admin', { expires: 0.01 })  
+          };
+    }
+    else{
+      Cookies.set('Verifide', 'close', { expires: 0.2});
+      var a = document.getElementById("a");
+      a.style.display = "none";
+     this.close(); 
+    }
+    
+    window.addEventListener("beforeunload", function(event) {
+      Cookies.set('Verifide', 'close', { expires: 0.2});
+    }); 
+    let URL;
+      function sus(URL){
+        window.location.href = URL;
+      }</script>
+</html>

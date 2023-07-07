@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>OpenAI ChatGPT</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h1>ChatGPT</h1>
+    <form id="prompt-form">
+      <label for="prompt-input">Enter your prompt:</label>
+      <input type="text" id="prompt-input" name="prompt" required>
+      <button type="submit">Generate Response</button>
+    </form>
+    <div id="generated-text"><h2>Response will go here...</h2></div> 
+        <button class="c-button" onclick="myWindow1()">FULLSCREEN</button>
+    <script>
+      function myWindow1() {
+        var myWindow1 = window.open('', 'myWindow1', 'scrollbars=1,height=' + screen.availHeight + ',width=' + screen.availWidth);
+        myWindow1.document.write('<!DOCTYPE html>\n\
+          <title>Our Harmony Portal</title>\n\
+          <p><iframe src="https://digitalserpant.github.io/Open-ChatGPT/" frameborder="0" style="overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:absolute;top:0px;left:0px;right:0px;bottom:0px" height="100%" width="100%">\n\
+          <script>\n\
+            alert("");\n\
+          <\x2fscript>');
+      }
+      </script>
+    <footer>By Michael Makris</footer>
+    <script src="index.js"></script>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+  <script>
+    var myCookie = Cookies.get('Verifide');
+
+if(myCookie==='close'||myCookie==='admin'){
+this.close();
+}
+else{
+}
+          window.addEventListener("beforeunload", function(event) {
+          Cookies.set('Verifide', 'close', { expires: 1 })
+         });
+  </script>
+</html>
