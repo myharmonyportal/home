@@ -1,0 +1,629 @@
+<html class="pixel-ratio-1 watch-active-state"><head>
+    <title>MyHarmonyPortal</title>
+    	<link rel="icon" type="image/x-icon" href="favicon.png">
+    <style>
+      .message-sent .message-text {
+    background-color: #ff0000;
+    color: #000000;
+}
+
+
+    </style>
+    <meta http-equiv="content-language" content="en">
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="manifest" href="/icons/manifest.json">
+    <meta name="msapplication-TileColor" content="black">
+    <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
+    <meta name="theme-color" content="black">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="https://digitalserpant.github.io/IDNS_FLOODER//css/framework7.ios.min.css">
+    <link rel="stylesheet" href="https://digitalserpant.github.io/IDNS_FLOODER/css/framework7.ios.colors.min.css">
+    <link rel="stylesheet" href="https://digitalserpant.github.io/IDNS_FLOODER/css/app.css">
+
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-40944202-3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-40944202-3');
+    </script>
+    <script>
+var myApp = new Framework7();
+var $$ = Dom7;
+var wsURL = 'ws://ws.idnsportal.com:444/';
+
+var myMessages = myApp.messages('.messages', {autoLayout : true});
+
+var messageLimit = 1000;
+var messageCounter = 0;
+
+var lastMessageId = "-1";
+var lastRoundTime = 0;
+var webSocket;
+
+var avatarsEnabled = true; // window.screen.width > 320;
+
+var keepAliveTimeout;
+
+var dupMessagesCount = 0;
+var lastMessageText = '';
+var ignoreEnterReleaseOnce = false;
+
+var fullScreen = false;
+
+var webSocketFailed = false;
+
+function launchFullscreen(element)
+{
+    if (element.requestFullscreen)
+    {
+        element.requestFullscreen();
+    }
+    else if (element.mozRequestFullScreen)
+    {
+        element.mozRequestFullScreen();
+    }
+    else if (element.webkitRequestFullscreen)
+    {
+        element.webkitRequestFullscreen();
+    }
+    else if (element.msRequestFullscreen)
+    {
+        element.msRequestFullscreen();
+    }
+}
+
+function exitFullscreen()
+{
+    if (document.exitFullscreen)
+    {
+        document.exitFullscreen();
+    }
+    else if (document.mozCancelFullScreen)
+    {
+        document.mozCancelFullScreen();
+    }
+    else if (document.webkitExitFullscreen)
+    {
+        document.webkitExitFullscreen();
+    }
+}
+
+var restrictLangRegExp;
+if (typeof restrictLangRule === 'string' && restrictLangRule.length > 0)
+    restrictLangRegExp = new RegExp(restrictLangRule, 'gi');
+
+var unlockHelpRegex = /((how|lock|activation|remove).*(icloud|bypass|activation|unlock))|((icloud|bypass|activation).*(how|lock|activation|remove))/i;
+
+var messageCache = [];
+
+$$('.openEmoji').on('click', function() {
+    myApp.pickerModal('.emojiPicker', false, true);
+    return;
+});
+
+$$(".emoji").click(function() {
+    var messageField = document.getElementById("message");
+    var emojiText = $$(this).html();
+    var message = messageField.value;
+
+    var startPos = message.length;
+    if (messageField.selectionStart || messageField.selectionStart == '0')
+    {
+        startPos = messageField.selectionStart;
+        var endPos = messageField.selectionEnd;
+        messageField.value =
+            messageField.value.substring(0, startPos) + emojiText + messageField.value.substring(endPos, messageField.value.length);
+    }
+    else
+        messageField.value += emojiText;
+    myApp.closeModal('.emojiPicker', true);
+
+    messageField.focus();
+    messageField.setSelectionRange(startPos + emojiText.length, startPos + emojiText.length);
+});
+
+function sendCommand(command)
+{
+    document.getElementById("message").value = command;
+    sendMessage();
+}
+
+function ban(userCode)
+{
+    if (window.confirm("Are you sure to ban \"" + userCode + "\"?\nHis all messages will be deleted."))
+    {
+        sendCommand('/ban ' + userCode);
+    }
+}
+
+function keepAlive()
+{
+    if (webSocketFailed)
+        return;
+    if (typeof keepAliveTimeout !== 'undefined')
+        clearTimeout(keepAliveTimeout);
+    if (webSocket == null)
+    {
+        connect();
+        return;
+    }
+    webSocket.send(JSON.stringify({"type" : "ping", "group" : chatGroupID}));
+    keepAliveTimeout = setTimeout(function() {
+        connect();
+    }, 10000);
+}
+
+function reloadMessages()
+{
+    // myMessages.clean();
+    // messageCounter = 0;
+    // lastMessageId = "-1";
+    // lastRoundTime = 0;
+    // lastMessageText = '';
+
+    // connect();
+    location.reload();
+}
+
+function processMessage(data)
+{
+    if (data.type === 'pong')
+    {
+        if (typeof keepAliveTimeout !== 'undefined')
+            clearTimeout(keepAliveTimeout);
+        keepAliveTimeout = setTimeout(function() {
+            keepAlive();
+        }, 30000);
+        return;
+    }
+
+    if (data.type === 'message')
+    {
+        // if (data.data.startsWith('M:'))
+        //     return;
+        if (data.message.created > 0)
+        {
+            var nextRoundTime = Math.round(data.message.created / 500000);
+            if (lastRoundTime != nextRoundTime)
+            {
+                lastRoundTime = nextRoundTime;
+                var currentDate = data.message.created > 0 ? (new Date(data.message.created)) : (new Date());
+
+                data.message.day = currentDate.toLocaleDateString();
+                data.message.time = currentDate.toLocaleTimeString();
+            }
+        }
+
+        data.message.name = data.message.name.split('|')[0];
+        if (data.message.label.length > 0)
+        {
+            data.message.name += ' | ' + data.message.label;
+            data.message.label = '';
+        }
+
+        if (!avatarsEnabled)
+            data.message.avatar = '';
+
+        if (!myMessages.params.scrollMessagesOnlyOnEdge)
+            messageCache.push(data.message);
+        else
+        {
+            if (messageCounter > messageLimit)
+            {
+                reloadMessages();
+                return;
+            }
+            myMessages.addMessage(data.message, 'append');
+            ++messageCounter;
+        }
+        lastMessageId = data.message.messageId;
+        return;
+    }
+
+    if (data.type === 'command')
+    {
+        if (data.name === 'notification')
+        {
+            myApp.addNotification(JSON.parse(data.data));
+            return;
+        }
+
+        if (data.name === 'setNickName')
+        {
+            if (data.data.substring(0, 4) != 'User')
+                document.getElementById("name").value = data.data;
+            return;
+        }
+
+        if (data.name === 'reload')
+        {
+            reloadMessages();
+            return;
+        }
+
+        if (data.name === 'online')
+        {
+            document.getElementById("online").innerHTML = data.data;
+            return;
+        }
+
+        if (data.name === 'initFinished')
+        {
+            messageCounter = messageCache.length;
+            for (var iN = 0; iN < messageCache.length; ++iN)
+                myMessages.addMessage(messageCache[iN], 'append', false);
+            messageCache = [];
+            myMessages.params.scrollMessagesOnlyOnEdge = true;
+            return;
+        }
+        return;
+    }
+
+    if (data.type === 'init')
+    {
+        if (lastMessageId == '-1')
+            lastMessageId = '0';
+        myMessages.params.scrollMessagesOnlyOnEdge = false;
+        if (data.name != undefined && data.name.length > 0 && data.name.substring(0, 4) != 'User')
+            document.getElementById("name").value = data.name;
+        keepAlive();
+
+        return;
+    }
+    return;
+}
+
+var rest = new XMLHttpRequest();
+
+function requestUpdates()
+{
+    rest.open("POST", '/updates', true);
+    rest.setRequestHeader("Content-Type", "application/json");
+    rest.send(JSON.stringify({
+        "name" : document.getElementById("name").value.trim(),
+        "type" : "init",
+        "group" : chatGroupID,
+        "country" : country,
+        "lastMessageId" : lastMessageId,
+        "userAgent" : navigator.userAgent
+    }));
+
+    rest.onreadystatechange = function() {
+        if (rest.readyState === 4)
+        {
+            if (rest.status === 200)
+            {
+                var answers = JSON.parse(this.responseText);
+                if (typeof answers !== 'undefined')
+                    for (var n = 0; n < answers.length; ++n)
+                        processMessage(answers[n]);
+                requestUpdates();
+            }
+            else
+                setTimeout(connect, 1000);
+        }
+    };
+}
+
+function connect()
+{
+    if (webSocketFailed)
+    {
+        requestUpdates();
+    }
+    else
+    {
+        if (typeof webSocket !== 'undefined')
+        {
+            webSocket.close();
+            delete webSocket;
+        }
+        if (typeof window.chrome !== 'undefined')
+            webSocket = new WebSocket(wsURL);
+        else
+            webSocket = new WebSocket(wsURL, [ chatGroupID ]);
+
+        webSocket.onopen = function(event) {
+            webSocket.send(JSON.stringify({
+                "name" : document.getElementById("name").value.trim(),
+                "type" : "init",
+                "group" : chatGroupID,
+                "country" : country,
+                "lastMessageId" : lastMessageId,
+                "userAgent" : navigator.userAgent
+            }));
+        };
+
+        webSocket.onmessage =
+            function(event) {
+            var data = JSON.parse(event.data);
+            processMessage(data);
+            return;
+        }
+
+            webSocket.onclose = function(e) {
+            webSocket = null;
+            if (e.code == 1006)
+                webSocketFailed = true;
+            setTimeout(connect, 1000);
+        };
+
+        webSocket.onerror = function(err) {
+            webSocket.close();
+        };
+    }
+}
+
+connect();
+
+var myMessagebar = myApp.messagebar('.messagebar');
+
+function sendMessage()
+{
+    var messageText = document.getElementById("message").value.trim();
+
+    var messageTextLower = messageText.toLowerCase();
+    if (messageTextLower == '/fullscreen')
+    {
+        document.getElementById("message").value = '';
+        launchFullscreen(document.documentElement);
+        return;
+    }
+
+    if (messageText.length > 20 && chatLocale != 'cn' && messageText.indexOf(' ') == -1 && messageText.indexOf('.') == -1 &&
+        messageText.indexOf('http') == -1)
+    {
+        ignoreEnterReleaseOnce = true;
+        myApp.addNotification(
+            {title : 'iDNS Portal', message : 'Please do not flood here or you will get banned', closeOnClick : true, hold : 10000});
+        return;
+    }
+
+    if (messageText.match(unlockHelpRegex))
+    {
+        ignoreEnterReleaseOnce = true;
+        myApp.addNotification({
+            title : 'iDNS Portal',
+            message : 'To find all known methods please visit idnsportal.com and complete the wizard',
+            closeOnClick : true,
+            hold : 60000
+        });
+        document.getElementById("message").value = '';
+        return;
+    }
+
+    if (messageTextLower.indexOf('httpmethod') > -1)
+    {
+        ignoreEnterReleaseOnce = true;
+        myApp.addNotification(
+            {title : 'iDNS Portal', message : 'To find alternative lines visit idnsportal.com', closeOnClick : true, hold : 10000});
+        return;
+    }
+
+    if (typeof restrictLangRegExp !== 'undefined' && messageText.match(restrictLangRegExp) && messageText.indexOf('Слава Україні') == -1 &&
+        messageText.indexOf('Героям Слава') == -1)
+    {
+        ignoreEnterReleaseOnce = true;
+        myApp.addNotification({title : 'iDNS Portal', message : restrictLangMessage, closeOnClick : true, hold : 10000});
+        return;
+    }
+
+    document.getElementById("message").value = '';
+    if (messageText.length === 0)
+        return;
+
+    if (lastMessageText == messageTextLower)
+    {
+        ++dupMessagesCount;
+        if (dupMessagesCount > 1)
+            return;
+    }
+    else
+    {
+        dupMessagesCount = 0;
+        lastMessageText = messageTextLower;
+    }
+
+    if (webSocketFailed)
+    {
+        rest.open("POST", '/updates', true);
+        rest.setRequestHeader("Content-Type", "application/json");
+        rest.send(JSON.stringify({
+            "name" : document.getElementById("name").value.trim(),
+            "type" : "init",
+            "group" : chatGroupID,
+            "country" : country,
+            "lastMessageId" : lastMessageId,
+            "text" : messageText,
+            "date" : Date.now(),
+            "userAgent" : navigator.userAgent
+        }));
+
+        rest.onreadystatechange = function() {
+            if (rest.readyState === 4)
+            {
+                if (rest.status === 200)
+                {
+                    var answers = JSON.parse(this.responseText);
+                    if (typeof answers !== 'undefined')
+                        for (var n = 0; n < answers.length; ++n)
+                            processMessage(answers[n]);
+                    requestUpdates();
+                }
+                else
+                    connect();
+            }
+        };
+    }
+    else
+    {
+        webSocket.send(JSON.stringify({
+            "type" : "message",
+            "group" : chatGroupID,
+            "name" : document.getElementById("name").value.trim(),
+            "text" : messageText,
+            "date" : Date.now()
+        }));
+    }
+
+    if (messageTextLower.indexOf('/') != 0)
+    {
+        $$('.messageinput').prop('disabled', true);
+        setTimeout(function() {
+            $$('.messageinput').prop('disabled', false);
+        }, 3000);
+    }
+}
+
+// $$('.messageinput').keyup(function(e) {
+//     if (e.which == 13)
+//     {
+//         var msgBox = document.getElementById("message");
+//         if (ignoreEnterReleaseOnce)
+//         {
+//             ignoreEnterReleaseOnce = false;
+//             msgBox.value = msgBox.value.trim();
+//         }
+//         else
+//             msgBox.value = '';
+//     }
+// });
+
+// $$('.messageinput').keydown(function(e) {
+//     if (e.which == 13)
+//         sendMessage();
+// });
+
+$$('.messagebar .link').on('click', function() {
+    sendMessage();
+    return;
+});
+
+    </script>
+
+</head>
+
+<body class="layout-dark framework7-root" style="background-color: black; margin: 0">
+    <div class="views">
+        <div class="view view-main" data-page="home">
+            <div class="pages theme-lightblue">
+                <div data-page="home" class="page navbar-fixed toolbar-fixed">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="left">
+    <div class="left"><a href="javascript:history.back();" class="link external"><i class="icon icon-back"></i></a></div>
+    <input id="name" placeholder="Your name" style="width: 100px; border-radius: 10px; font-size: 1em; padding: 2px; border: 0px; text-align: center" maxlength="20"></div>
+                            <div class="center" style="left: 0px;">OurHarmony</div>
+                            <div class="right">
+                                <div>Online:&nbsp;</div>
+                                <div id="online">5</div>
+                                <div>&nbsp;</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="toolbar messagebar">
+                        <div class="toolbar-inner">
+                            <a href="#" style="border: 0px; justify-content: center; align-items: center; font-size: 100%; min-width: 45px" class="button openEmoji open-popover">😊</a>
+                            <textarea id="message" class="messageinput" placeholder="Message" maxlength="512"></textarea>
+                        </div>
+                    </div>
+                    <div class="page-content messages-content" style="background: #444">
+                        <div class="messages messages-auto-layout">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  <div class="popover emojiPicker popover-target">
+    <div class="popover-angle"></div><!-- 
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <div class="left"></div>
+        <div class="right"><a href="#" class="close-popover">X</a></div>
+      </div>
+    </div> -->
+    <div class="popover-inner">
+      <div class="content-block" style="font-size:2rem;width:100%;text-align:center;">
+        <a href="#" class="emoji">Слава Україні!</a><br><br>
+        <a href="#" class="emoji">🇺🇦</a>
+        <a href="#" class="emoji">☮️</a>
+        <a href="#" class="emoji">😊</a>
+        <a href="#" class="emoji">😃</a>
+        <a href="#" class="emoji">😎</a>
+        <a href="#" class="emoji">😇</a>
+        <a href="#" class="emoji">😭</a>
+        <a href="#" class="emoji">😤</a>
+        <a href="#" class="emoji">😢</a>
+        <a href="#" class="emoji">🤣</a>
+        <a href="#" class="emoji">🤪</a>
+        <a href="#" class="emoji">🪩</a>
+        <a href="#" class="emoji">👋</a>
+        <a href="#" class="emoji">👏</a>
+        <a href="#" class="emoji">🎧</a>
+        <a href="#" class="emoji">🥶</a>
+        <a href="#" class="emoji">💣</a>
+        <a href="#" class="emoji">😈</a>
+        <a href="#" class="emoji">😍</a>
+        <a href="#" class="emoji">💩</a>
+        <a href="#" class="emoji">💋</a>
+        <a href="#" class="emoji">💙</a>
+        <a href="#" class="emoji">💛</a>
+        <a href="#" class="emoji">❤️</a>
+        <a href="#" class="emoji">💚</a>
+        <a href="#" class="emoji">💜</a>
+        <a href="#" class="emoji">💔</a>
+        <a href="#" class="emoji">😡</a>
+        <a href="#" class="emoji">👍</a>
+        <a href="#" class="emoji">👎</a>
+        <a href="#" class="emoji">👾</a>
+        <a href="#" class="emoji">👠</a>
+        <a href="#" class="emoji">⌚️</a>
+        <a href="#" class="emoji">📱</a>
+        <a href="#" class="emoji">💻</a>
+        <a href="#" class="emoji">🎃</a>
+        <a href="#" class="emoji">👀</a>
+        <a href="#" class="emoji">👅</a>
+        <a href="#" class="emoji">💅</a>
+      </div>
+    </div>
+  </div>
+    <script type="text/javascript" src="https://digitalserpant.github.io/IDNS_FLOODER/js/framework7.min.js"></script>
+    <script type="text/javascript" src="https://digitalserpant.github.io/IDNS_FLOODER/js/country.js"></script>
+    <script>
+    var chatGroupID = 'idns_en';
+    var chatLocale = 'en';
+    </script>
+    <script type="text/javascript" src="https://digitalserpant.github.io/IDNS_FLOODER/js/app.js"></script>
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+<script>
+  var myCookie = Cookies.get('Verifide');
+
+if(myCookie==='close'){
+this.close();
+}
+else{
+}
+        window.addEventListener("beforeunload", function(event) {
+        Cookies.set('Verifide', 'close', { expires: 1 })
+       });
+</script>
+</html>
